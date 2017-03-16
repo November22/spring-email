@@ -16,6 +16,9 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.ui.velocity.VelocityEngineFactoryBean;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring3.SpringTemplateEngine;
 
 import spring.email.config.RootConfig;
 
@@ -25,6 +28,9 @@ import spring.email.config.RootConfig;
 public class TestEmail {
 	@Autowired
 	private JavaMailSenderImpl mailSender;
+	
+	@Autowired
+	private SpringTemplateEngine thymeleaf;
 	
 	@Test
 	public void test_send_txt(){
@@ -74,6 +80,36 @@ public class TestEmail {
 		//第二个参数表明第一个参数传入的是HTML
 		helper.setText("<html><body><img src='cid:logo' />"
 				+ "<h4>主题名称</h4> <h1>哇哈哈</h1></body></html>" , true );
+		
+		ClassPathResource img = new ClassPathResource("/hashiqi.jpg");
+		//名称与图片对应
+		helper.addInline("logo", img);
+		
+		mailSender.send(message);
+	}
+	
+	/**
+	 * 使用模板发送富文本内容
+	 * @throws MessagingException
+	 */
+	@Test
+	public void test_sned_thymeleaf() throws MessagingException{
+		
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message , true);
+		
+		helper.setFrom("****@163.com");
+		helper.setTo("****@126.com");
+		
+		helper.setSubject("主题");
+		
+		Context ctx = new Context();
+		ctx.setVariable("name", "nov");
+		ctx.setVariable("password", "123456");
+		String process = thymeleaf.process("emailTemplate.html", ctx);
+		System.err.println(process);
+		
+		helper.setText(process , true);
 		
 		ClassPathResource img = new ClassPathResource("/hashiqi.jpg");
 		//名称与图片对应
