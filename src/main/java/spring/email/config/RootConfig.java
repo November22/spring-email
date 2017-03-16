@@ -13,8 +13,8 @@ public class RootConfig {
 	@Bean
 	public MailSender getMailSender(){
 		JavaMailSenderImpl sender = new JavaMailSenderImpl();
-		sender.setUsername("itheima14");
-		sender.setPassword("iamsorry");
+		sender.setUsername("****");
+		sender.setPassword("****");
 		sender.setHost("smtp.163.com");
 		Properties props = new Properties();
 		props.setProperty("mail.smtp.auth", "true");
